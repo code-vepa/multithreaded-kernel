@@ -17,5 +17,6 @@ struct idtr_desc
     uint16_t base; // base address of the start of the IDT
 } __attribute__((packed));
 
+void idt_init();
 
 #endif

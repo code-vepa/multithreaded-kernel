@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include <stddef.h>
 #include <stdint.h>
+#include "idt/idt.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -60,9 +61,16 @@ void print(const char* str){
     }
 }
 
+extern void test_problem();
+
 void kernel_main(void){
 
     terminal_initialize();
     // first byte (03) is the color and second byte is (41) is the char
     print("Hello world\ntest");
+
+    //initialize the IDT
+    idt_init();
+
+    test_problem();
 }
