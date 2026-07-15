@@ -1,7 +1,6 @@
 [BITS 32] ; All code underneath is seen as 32 bits
 
 global _start
-global test_problem
 
 extern kernel_main
 
@@ -26,10 +25,5 @@ _start:
 
     call kernel_main
     jmp $
-
-test_problem:
-    mov eax, 0
-    div eax
-
 
 times 512-($ - $$) db 0
