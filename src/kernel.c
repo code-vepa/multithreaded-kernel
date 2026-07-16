@@ -72,7 +72,6 @@ void kernel_main(void){
     //initialize the IDT
     idt_init();
 
-    //test
-    outb(0x60, 0xff);
+    
 
 }
