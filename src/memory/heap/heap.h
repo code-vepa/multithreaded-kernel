@@ -12,15 +12,16 @@
 
 typedef unsigned char HEAP_BLOCK_TABLE_ENTRY;
 
-struct heap_table
-{
+typedef struct{
     HEAP_BLOCK_TABLE_ENTRY* entries;
     size_t total_entries;
-};
+}  heap_table;
 
-struct heap_chunk{
+typedef struct{
     struct heap_table* table_ptr;
     void* start_address;
-};
+}  heap_chunk;
+
+int heap_create(heap_chunk* heap, void* ptr, void* end, heap_table* table);
 
 #endif
