@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "idt/idt.h"
 #include "io/io.h"
+#include "memory/heap/kernel_heap.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -69,9 +70,10 @@ void kernel_main(void){
     // first byte (03) is the color and second byte is (41) is the char
     print("Hello world\ntest");
 
+    //Initialize the Heap
+    kernel_heap_init();
+    
     //initialize the IDT
     idt_init();
-
-    
 
 }
