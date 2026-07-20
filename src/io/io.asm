@@ -9,7 +9,7 @@ insb:
     push ebp
     mov ebp, esp
 
-    xor eax, eax
+    xor eax, eax ; eax = 0
     mov edx, [ebp + 8]
     in al, dx
 
