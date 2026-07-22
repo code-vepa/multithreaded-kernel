@@ -9,6 +9,21 @@ size_t strlen(const char* ptr){
     return count;
 }
 
+size_t strnlen(const char* ptr, int max){
+    size_t i = 0;
+
+    for(i = 0; i < max; ++i){
+        if(ptr[i] == 0)
+            break;
+    }
+
+    return i;
+}
+
+int isdigit(char c){
+    return c >= 48 && c <= 57;
+}
+
 int to_numeric_digit(char c){
     return c - 48;
 }

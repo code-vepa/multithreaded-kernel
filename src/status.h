@@ -5,4 +5,6 @@
 #define EIO 1 //ERROR: IO
 #define EINVARG 2 //ERROR: Invalid Argument
 #define ENOMEM 3 //ERROR: no memory (out of memory)
+#define EBADPATH 4 //ERROR: bad path (for filesystem)
+
 #endif
