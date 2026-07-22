@@ -11,4 +11,8 @@ struct path_root{
     path_part_t* first;
 } typedef path_root_t;
 
+
+path_root_t* pathparser_parse(const char* path, const char* current_directory_path);
+void pathparser_free(path_root_t* root);
+
 #endif
