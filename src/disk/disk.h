@@ -1,6 +1,8 @@
 #ifndef DISK_H
 #define DISK_H
 
+#include "filesystem/file.h"
+
 typedef unsigned int VARGOOS_DISK_TYPE;
 
 //real physical hard disk
@@ -10,6 +12,7 @@ typedef unsigned int VARGOOS_DISK_TYPE;
 struct disk{
     VARGOOS_DISK_TYPE type;
     int sector_size;
+    filesystem_t* filesystem;
 }typedef disk_t;
 
 void disk_search_init();

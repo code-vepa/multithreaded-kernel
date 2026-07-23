@@ -1,4 +1,4 @@
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/build_idt/idt.asm.o ./build/build_idt/idt.o ./build/build_memory/memory.o ./build/build_io/io.asm.o ./build/build_memory/heap/heap.o ./build/build_memory/heap/kernel_heap.o ./build/build_memory/paging/paging.o ./build/build_memory/paging/paging.asm.o ./build/build_disk/disk.o ./build/build_disk/disk_streamer.o ./build/build_filesystem/path_parser.o ./build/build_string/string.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/build_idt/idt.asm.o ./build/build_idt/idt.o ./build/build_memory/memory.o ./build/build_io/io.asm.o ./build/build_memory/heap/heap.o ./build/build_memory/heap/kernel_heap.o ./build/build_memory/paging/paging.o ./build/build_memory/paging/paging.asm.o ./build/build_disk/disk.o ./build/build_disk/disk_streamer.o ./build/build_filesystem/path_parser.o ./build/build_filesystem/file.o ./build/build_string/string.o
 INCLUDES = -I ./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-nounsed-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -6,9 +6,10 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
-	dd if=/dev/zero bs=512 count=100 >> ./bin/os.bin
-
+	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
+#	~/opt/mtools/bin/mcopy -o -i ./bin/os.bin ./hello.txt ::/
 	
+
 ./bin/kernel.bin: $(FILES)
 	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
 	i686-elf-gcc $(FLAGS) -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
@@ -55,6 +56,9 @@ all: ./bin/boot.bin ./bin/kernel.bin
 
 ./build/build_filesystem/path_parser.o: ./src/filesystem/path_parser.c
 	i686-elf-gcc $(INCLUDES) -I ./src/filesystem $(FLAGS) -std=gnu99 -c ./src/filesystem/path_parser.c -o ./build/build_filesystem/path_parser.o
+
+./build/build_filesystem/file.o: ./src/filesystem/file.c
+	i686-elf-gcc $(INCLUDES) -I ./src/filesystem $(FLAGS) -std=gnu99 -c ./src/filesystem/file.c -o ./build/build_filesystem/file.o
 
 ./build/build_disk/disk_streamer.o: ./src/disk/disk_streamer.c
 	i686-elf-gcc $(INCLUDES) -I ./src/disk $(FLAGS) -std=gnu99 -c ./src/disk/disk_streamer.c -o ./build/build_disk/disk_streamer.o

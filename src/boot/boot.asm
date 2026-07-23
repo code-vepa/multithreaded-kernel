@@ -4,11 +4,34 @@ BITS 16 ; generate 16 bit code (real-mode)
 ; gives offsets
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
-_start:
-    jmp short start ; skip over BIOS Parameter Block (BPB)
-    nop
 
-times 33 db 0 ; reserve 33 bytes
+
+
+jmp short start ; skip over BIOS Parameter Block (BPB)
+nop
+
+; FAT16 header
+OEMIdentifier       db 'VARGOOS ' ; 8 bytes
+BytesPerSector      dw 0x200 ; 512 bytes per sector
+SectorsPerCluster   db 0x80
+ReservedSectors     dw 200
+FATCopes            db 0x02 ; Original and Backup
+RootDirEntries      dw 0x40
+NumSectors          dw 0x00
+MediaType           db 0xF8
+SectorsPerFat       dw 0x100
+SectorsPerTrack     dw 0x20
+NumberOfHeads       dw 0x40
+HiddenSectors       dd 0x00
+SectorsBig          dd 0x773594
+
+; Extended BPB (Dos 4.0)
+DriveNumber         db 0x80
+WinNTbit            db 0x00
+Signature           db 0x29
+VolumeID            dd 0xD105
+VolumeIDString      db 'VARGOOS BOT'
+SystemIDString      db 'FAT16   '
 
 start:
     ; far jump (changes Code Segment and Instruction Pointer)
