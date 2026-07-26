@@ -25,8 +25,8 @@ void idt_zero(){
     print("Division by zero\n");
 }
 
-void idt_set(int interrupt_num, void* address){
-    struct idt_desc* desc = &idt_descriptors[interrupt_num];
+void idt_set(int interrupt_no, void* address){
+    struct idt_desc* desc = &idt_descriptors[interrupt_no];
     desc->offset_1 = (uint32_t) address & 0xffff;
     desc->selector = KERNEL_CODE_SELECTOR;
     desc->zero = 0x00;

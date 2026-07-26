@@ -5,9 +5,9 @@
 struct idt_desc
 {
     uint16_t offset_1; // Offset bits 0 - 15
-    uint16_t selector;
+    uint16_t selector; // Code segment selector t ojump into
     uint8_t zero; //Unused set to zero
-    uint8_t type_attr;
+    uint8_t type_attr; // Present bit, gate type
     uint16_t offset_2; // Offset buts 16 - 31
 } __attribute__((packed));
 

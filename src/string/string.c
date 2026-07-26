@@ -27,3 +27,15 @@ int isdigit(char c){
 int to_numeric_digit(char c){
     return c - 48;
 }
+
+char* strcpy(char* dest, const char* src){
+    size_t i = 0;
+
+    while(src[i] != '\0'){
+        dest[i] = src[i];
+        ++i;
+    }
+
+    dest[i] = 0x00;
+    return dest;
+}

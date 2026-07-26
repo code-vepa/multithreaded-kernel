@@ -74,6 +74,7 @@ void kernel_main(void){
     
     //initialize the IDT
     idt_init();
+    
 
     //setup paging
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
@@ -87,11 +88,9 @@ void kernel_main(void){
     //enable system interrupts
     enable_interrupts();
 
-    disk_stream_t* stream =  diskstreamer_new(0);
-    diskstreamer_seek(stream, 0x201);
-    unsigned char c = 0;
-    diskstreamer_read(stream, &c, 1);
-    while(1){
+    char buf[20];
+    strcpy(buf, "hello!");
 
-    }
+    while(1){}
+
 }
