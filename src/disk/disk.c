@@ -56,6 +56,7 @@ void disk_search_init(){
     memset(&disk, 0, sizeof(disk));
     disk.type = VARGOOS_DISK_TYPE_REAL;
     disk.sector_size = VARGOOS_SECTOR_SIZE;
+    disk.id = 0;
     disk.filesystem = fs_resolve(&disk);
 }
 

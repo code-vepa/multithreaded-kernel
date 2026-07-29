@@ -29,13 +29,15 @@ int to_numeric_digit(char c){
 }
 
 char* strcpy(char* dest, const char* src){
-    size_t i = 0;
+    char* tmp = dest;
 
-    while(src[i] != '\0'){
-        dest[i] = src[i];
-        ++i;
+    while(*src != 0){
+        *dest = *src;
+        ++src;
+        ++dest;
     }
 
-    dest[i] = 0x00;
-    return dest;
+    *dest = 0x00;
+
+    return tmp;
 }

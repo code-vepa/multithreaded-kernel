@@ -34,6 +34,10 @@ int diskstreamer_seek(disk_stream_t* streamer, int pos){
     return 0;
 }
 
+/*
+    @brief This reads a sector into memory and offsets to the correct position.
+*/
+
 int diskstreamer_read(disk_stream_t* stream, void* out, int total){
     int sector = stream->pos / VARGOOS_SECTOR_SIZE;
     int offset = stream->pos % VARGOOS_SECTOR_SIZE;

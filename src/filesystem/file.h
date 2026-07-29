@@ -32,7 +32,7 @@ typedef struct file_descriptor{
     disk_t* disk; //the disk that filesystem will be used on
 } file_descriptor_t;
 
-void filesystem_init();
+void fs_init();
 int fopen(const char* filename, const char* mode);
 void fs_insert_filesystem(filesystem_t* filesystem);
 filesystem_t* fs_resolve(disk_t* disk);

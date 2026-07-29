@@ -1,4 +1,4 @@
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/build_idt/idt.asm.o ./build/build_idt/idt.o ./build/build_memory/memory.o ./build/build_io/io.asm.o ./build/build_memory/heap/heap.o ./build/build_memory/heap/kernel_heap.o ./build/build_memory/paging/paging.o ./build/build_memory/paging/paging.asm.o ./build/build_disk/disk.o ./build/build_disk/disk_streamer.o ./build/build_filesystem/path_parser.o ./build/build_filesystem/file.o ./build/build_string/string.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/build_idt/idt.asm.o ./build/build_idt/idt.o ./build/build_memory/memory.o ./build/build_io/io.asm.o ./build/build_memory/heap/heap.o ./build/build_memory/heap/kernel_heap.o ./build/build_memory/paging/paging.o ./build/build_memory/paging/paging.asm.o ./build/build_disk/disk.o ./build/build_disk/disk_streamer.o ./build/build_filesystem/path_parser.o ./build/build_filesystem/file.o ./build/build_string/string.o ./build/build_filesystem/build_fat/fat16.o
 INCLUDES = -I ./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-nounsed-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -62,6 +62,10 @@ all: ./bin/boot.bin ./bin/kernel.bin
 
 ./build/build_disk/disk_streamer.o: ./src/disk/disk_streamer.c
 	i686-elf-gcc $(INCLUDES) -I ./src/disk $(FLAGS) -std=gnu99 -c ./src/disk/disk_streamer.c -o ./build/build_disk/disk_streamer.o
+
+./build/build_filesystem/build_fat/fat16.o: ./src/filesystem/fat/fat16.c
+	i686-elf-gcc $(INCLUDES) -I ./src/filesystem/fat $(FLAGS) -std=gnu99 -c ./src/filesystem/fat/fat16.c -o ./build/build_filesystem/build_fat/fat16.o
+
 
 clean:
 	rm -rf ./bin/boot.bin

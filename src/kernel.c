@@ -8,6 +8,7 @@
 #include "disk/disk.h"
 #include "disk/disk_streamer.h"
 #include "filesystem/path_parser.h"
+#include "filesystem/file.h"
 #include "string/string.h"
 
 uint16_t* video_mem = 0;
@@ -68,6 +69,9 @@ void kernel_main(void){
 
     //Initialize the Heap
     kernel_heap_init();
+
+    //Initialize the filesystems
+    fs_init();
 
     //Search and initialize the disks
     disk_search_init();

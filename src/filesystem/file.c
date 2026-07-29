@@ -4,6 +4,7 @@
 #include "status.h"
 #include "memory/heap/kernel_heap.h"
 #include "kernel.h"
+#include "fat/fat16.h"
 
 filesystem_t* filesystems[VARGOOS_MAX_FILESYSTEMS];
 file_descriptor_t* file_descriptors[VARGOOS_MAX_FILE_DESCRIPTORS];
@@ -34,7 +35,7 @@ void fs_insert_filesystem(filesystem_t* filesystem){
 }
 
 static void fs_static_load(){
-//    fs_insert_filesystem(fat16_init());
+    fs_insert_filesystem(fat16_init());
 }
 
 void fs_load(){
