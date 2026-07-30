@@ -5,6 +5,8 @@
 #include "memory/heap/kernel_heap.h"
 #include "kernel.h"
 #include "fat/fat16.h"
+#include "disk/disk.h"
+
 
 filesystem_t* filesystems[VARGOOS_MAX_FILESYSTEMS];
 file_descriptor_t* file_descriptors[VARGOOS_MAX_FILE_DESCRIPTORS];
@@ -93,6 +95,75 @@ filesystem_t* fs_resolve(disk_t* disk){
     return fs;
 }
 
-int fopen(const char* filename, const char* mode){
-    return -EIO;
+
+FILE_MODE get_file_mode_by_string(const char* str){
+	FILE_MODE mode = FILE_MODE_INVALID;
+	
+	if(strncmp(str, "r", 1) == 0){
+		mode = FILE_MODE_READ;
+	}
+	else if(strncmp(str, "w", 1) == 0){
+		mode = FILE_MODE_WRITE;
+	}
+	else if(strncmp(str, "a", 1) == 0){
+		mode = FILE_MODE_APPEND;
+	}
+	
+	return mode;
 }
+
+
+int fopen(const char* filename, const char* mode){
+	int response = 0;
+	path_root_t* root_path = pathparser_parse(filename, NULL);
+	if(!root_path){
+		response = -EINVARG;
+		goto out;
+	}
+	
+	if(!root_path->first){
+		response = -EINVARG;
+		goto out;
+	}
+
+	disk_t* disk = get_disk(root_path->drive_number);
+	if(!disk){
+		response = -EIO;
+		goto out;
+	}
+
+	if(!disk->filesystem){
+		response = -EIO;
+		goto out;
+	}
+
+
+
+out:
+	return response;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,6 +2,8 @@
 #include "status.h"
 #include "string/string.h"
 #include "memory/memory.h"
+#include "memory/heap/kernel_heap.h"
+
 
 int fat16_resolve(disk_t* disk);
 void* fat16_open(disk_t* disk, path_part_t* path, FILE_MODE mode);
@@ -44,13 +46,27 @@ int fat16_get_total_items_for_directory(disk_t* disk, uint32_t directory_start_s
     int directory_start_pos = directory_start_sector * disk->sector_size;
 
     disk_stream_t* stream = private->directory_stream;
-    diskstreamer_seek(stream, directory_start_pos);
-    while(1){
+    if(diskstreamer_seek(stream, directory_start_pos) != STATUS_OK){
+		response = -EIO;
+		goto out;
+	}
+
+	while(1){
         if(diskstreamer_read(stream, &item, sizeof(item)) != STATUS_OK){
             response = -EIO;
             goto out;
         }
-    }
+    	
+		if(item.filename[0] == 0x00){
+			break;
+		}
+
+		if(item.filename[0] == 0xE5){
+			continue;
+		}
+		++i; // Increase a total count
+	}
+	response = i;
 
 out:
     return response;
@@ -75,7 +91,7 @@ int fat16_get_root_directory(disk_t* disk, struct fat_private* fat_private, stru
         ++total_sectors;
     }
 
-    int total_items = fat16_get_total_items_for_directory(fat_private, root_dir_sector_pos);
+    int total_items = fat16_get_total_items_for_directory(disk, root_dir_sector_pos);
 
     struct fat_directory_item* dir = kzalloc(root_dir_size);
     if(!dir){
@@ -112,8 +128,11 @@ int fat16_resolve(disk_t* disk){
     int response = 0;
     struct fat_private* fat_private = kzalloc(sizeof(struct fat_private)); 
     fat16_init_private(disk, fat_private);
-
-    disk_stream_t* stream = diskstreamer_new(disk->id);
+	
+	disk->fs_private = fat_private;
+	disk->filesystem = &fat16_fs;
+    
+	disk_stream_t* stream = diskstreamer_new(disk->id);
     if(!stream){
         response = -ENOMEM;
         goto out;
@@ -131,14 +150,24 @@ int fat16_resolve(disk_t* disk){
         goto out;
     }
 
-    if(fat16_get_rppt_directory(disk, fat_private, &fat_private->root_directory) != STATUS_OK){
+    if(fat16_get_root_directory(disk, fat_private, &fat_private->root_directory) != STATUS_OK){
         response = -EIO;
         goto out;
     }
+	
 
 
 out:
-    return response;
+	if(stream){
+		diskstreamer_close(stream);
+	}
+
+	if(response < 0){
+		kfree(fat_private);
+		disk->fs_private = 0;
+	}
+    
+	return response;
 }
 
 
