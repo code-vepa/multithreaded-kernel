@@ -1,5 +1,14 @@
 #include "string.h"
 
+char tolower(char c){
+    // If c(char) is within the range of the alphabet
+    if(c >= 65 && c <= 90){
+        c += 32;
+    }
+
+    return c;
+}
+
 size_t strlen(const char* ptr){
     size_t count = 0;
 
@@ -28,6 +37,24 @@ int to_numeric_digit(char c){
     return c - 48;
 }
 
+int istrncmp(const char* str1, const char* str2, int n){
+    unsigned char u1, u2;
+
+    while(n-- > 0){
+        u1 = (unsigned char)*str1++;
+        u2 = (unsigned char)*str2++;
+
+        if(u1 != u2 && tolower(u1) != tolower(u2)){
+            return u1 - u2;
+        }
+
+        if(u1 == '\0')
+            return 0;
+    }
+
+    return 0;
+}
+
 int strncmp(const char* str1, const char* str2, int bytes){
 	unsigned char u1, u2;
 
@@ -39,7 +66,6 @@ int strncmp(const char* str1, const char* str2, int bytes){
 			return u1 - u2;
 		if(u1 == '\0')
 			return 0;
-		
 	}
 
 	return 0;

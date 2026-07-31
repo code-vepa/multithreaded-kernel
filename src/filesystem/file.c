@@ -6,6 +6,7 @@
 #include "kernel.h"
 #include "fat/fat16.h"
 #include "disk/disk.h"
+#include "string/string.h"
 
 
 filesystem_t* filesystems[VARGOOS_MAX_FILESYSTEMS];
@@ -112,8 +113,21 @@ FILE_MODE get_file_mode_by_string(const char* str){
 	return mode;
 }
 
+/*
+    step 0. fopen resolves the path by dividing into path root and path part
+    step 1. get the current disk (client provides disk drive number e.g 0:/)
+    step 2. check if disk doesn't have a fs in it (if doesn't then we cannot resolve)
+    step 3. retrieve mode
+    step 4. if it is a valid mode then open the fs that disk contains
+    This sequence will call fat16_open function which essentially will return a 
+    pointer to the its internal private data that will create for existing file.
 
-int fopen(const char* filename, const char* mode){
+    step 5. create a new file descriptor, set the new fs of the descriptor to the 
+    file system that we opened.
+    step 6. return the descriptor index.
+*/
+
+int fopen(const char* filename, const char* mode_string){
 	int response = 0;
 	path_root_t* root_path = pathparser_parse(filename, NULL);
 	if(!root_path){
@@ -137,9 +151,34 @@ int fopen(const char* filename, const char* mode){
 		goto out;
 	}
 
+    FILE_MODE mode  = get_file_mode_by_string(mode_string);
+    if(mode == FILE_MODE_INVALID){
+        response = -EINVARG;
+        goto out;
+    }
+
+    void* descriptor_private_data = disk->filesystem->open(disk, root_path->first, mode);
+    if(ISERR(descriptor_private_data)){
+        response = ERROR_I(descriptor_private_data);
+        goto out;
+    }
+
+    file_descriptor_t* desc = 0;
+    response = file_new_descriptor(&desc);
+    if(response < 0){
+        goto out;
+    }
+    desc->filesystem = disk->filesystem;
+    desc->private = descriptor_private_data;
+    desc->disk = disk;
+    response = desc->index;
 
 
 out:
+    if(response < 0){
+        response = 0;
+    }
+
 	return response;
 }
 

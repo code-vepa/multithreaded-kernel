@@ -33,7 +33,7 @@ typedef struct file_descriptor{
 } file_descriptor_t;
 
 void fs_init();
-int fopen(const char* filename, const char* mode);
+int fopen(const char* filename, const char* mode_string);
 void fs_insert_filesystem(filesystem_t* filesystem);
 filesystem_t* fs_resolve(disk_t* disk);
 

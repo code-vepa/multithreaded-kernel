@@ -18,7 +18,7 @@ struct disk{
 }typedef disk_t;
 
 void disk_search_init();
-disk_t* disk_get(int index);
+disk_t* get_disk(int index);
 int disk_read_block(disk_t* idisk, unsigned int lba, int total, void* buffer);
 
 #endif

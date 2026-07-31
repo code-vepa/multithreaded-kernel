@@ -11,7 +11,7 @@
 */
 
 disk_stream_t* diskstreamer_new(int disk_id){
-    disk_t* disk = disk_get(disk_id);
+    disk_t* disk = get_disk(disk_id);
     if(!disk){
         return NULL;
     }

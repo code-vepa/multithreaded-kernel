@@ -60,7 +60,7 @@ void disk_search_init(){
     disk.filesystem = fs_resolve(&disk);
 }
 
-disk_t* disk_get(int index){
+disk_t* get_disk(int index){
     if(index != 0) 
         return 0;
 
