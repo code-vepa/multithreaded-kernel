@@ -186,13 +186,35 @@ void fat16_to_proper_string(char** out, char* in){
     }
 }
 
+/*
+    @brief This function will convert a file name to the proper
+    string format and add an extention at the end.
+
+    e.g: filename: test    ext: txt   -> test.txt (will get rid of all spaces at the end)
+*/
 void fat16_get_full_relative_filename(struct fat_directory_item* item, char* out, int max_len){
     memset(out, 0, max_len);
     char* out_temp = out;
     fat16_to_proper_string(&out_temp, (const char*) item->filename);
     if(item->ext[0] != 0x00 && item->ext[0] != 0x20){
         *out_temp++ = '.';
+        fat16_to_proper_string(&out_temp, (const char*) item->ext);
     }
+}
+
+struct fat_item* fat16_new_fat_item_for_directory(disk_t* disk, struct fat_directory_item* item){
+    struct fat_item* fat_item = kzalloc(sizeof(struct fat_item));
+    if(!fat_item)
+        return 0;
+    
+    if(item->attribute & FAT_FILE_SUBDIRECTORY){
+        fat_item->directory = fat16_load_fat_directory(disk, item);
+        fat_item->type = FAT_ITEM_TYPE_DIRECTORY;
+    }
+
+    fat_item->type = FAT_ITEM_TYPE_FILE;
+    fat_item->item = fat16_clone_directory_item(item, sizeof(struct fat_directory_item));
+    return fat_item;
 }
 
 struct fat_item* fat16_find_item_in_directory(disk_t* disk, 
@@ -203,8 +225,12 @@ struct fat_item* fat16_find_item_in_directory(disk_t* disk,
 
     for(int i = 0; i < directory->total; ++i){
         fat16_get_full_relative_filename(&directory->item[i], temp_filename, sizeof(temp_filename));
+        if(istrncmp(temp_filename, part, sizeof(temp_filename)) == 0){
+            fat_item = fat16_new_fat_item_for_directory(disk, &directory->item[i]);
+        }
     }
 
+    return fat_item;
 }
 
 struct fat_item* fat16_get_directorory_entry(disk_t* disk, path_part_t* path){
