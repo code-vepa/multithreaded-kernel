@@ -202,6 +202,62 @@ void fat16_get_full_relative_filename(struct fat_directory_item* item, char* out
     }
 }
 
+struct fat_directory_item* fat16_clone_directory_item(struct fat_directory_item* item, int size){
+    struct fat_directory_item* item_copy = 0;
+    if(size < sizeof(struct fat_directory_item)){
+        return 0;
+    }
+    
+    item_copy = kzalloc(size);
+    if(!item_copy){
+        return 0;
+    }
+    memcpy(item_copy, item, size);
+    
+    return item_copy;
+}
+
+struct fat_directory* fat16_load_fat_directory(disk_t* disk, struct fat_directory_item* item){
+    int res = 0;
+    struct fat_directory* directory = 0;
+    struct fat_private* fat_private = disk->fs_private;
+    // Check for it to be a directory and not file
+    if(!(item->attribute & FAT_FILE_SUBDIRECTORY)){
+        res = -EINVARG;
+        goto out;
+    }
+
+    directory = kzalloc(sizeof(struct fat_directory));
+    if(!directory){
+        res = -ENOMEM;
+        goto out;
+    }
+
+    // Calculate a cluster
+    int cluster = fat16_get_first_cluster(item);
+    int cluster_sector = fat16_cluster_to_sector(fat_private, cluster);
+    int total_items = fat16_get_total_items_for_directory(disk, cluster_sector);
+    directory->total = total_items;
+    int directory_size = directory->total * sizeof(struct fat_directory_item);
+    directory->item = kzalloc(directory_size);
+    if(!directory->item){
+        res = -ENOMEM;
+        goto out;
+    }
+
+    res = fat16_read_internal(disk, cluster, 0x00, directory_size, directory->item);
+    if(res != STATUS_OK){
+        goto out;
+    }
+
+out:
+    if(res != STATUS_OK){
+        fat16_free_directory(directory);
+    }
+
+    return directory;
+}
+
 struct fat_item* fat16_new_fat_item_for_directory(disk_t* disk, struct fat_directory_item* item){
     struct fat_item* fat_item = kzalloc(sizeof(struct fat_item));
     if(!fat_item)
