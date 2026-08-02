@@ -2,7 +2,7 @@
 #define FILE_H
 
 #include "path_parser.h"
-
+#include <stdint.h>
 
 typedef unsigned int FILE_SEEK_MODE;
 enum{
@@ -17,11 +17,13 @@ enum{
 typedef struct disk disk_t;
 
 typedef void*(*FS_OPEN_FUNCTION)(disk_t* disk, path_part_t* part, FILE_MODE mode);
+typedef int(*FS_READ_FUNCTION)(disk_t* disk, void* private, uint32_t size, uint32_t nmemb, char* out);
 typedef int(*FS_RESOLVE_FUNCTION)(disk_t* disk);
 
 typedef struct filesystem{
     FS_RESOLVE_FUNCTION resolve;
     FS_OPEN_FUNCTION open;
+    FS_READ_FUNCTION read;
     char name[20];
 } filesystem_t;
 
@@ -34,6 +36,7 @@ typedef struct file_descriptor{
 
 void fs_init();
 int fopen(const char* filename, const char* mode_string);
+int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
 void fs_insert_filesystem(filesystem_t* filesystem);
 filesystem_t* fs_resolve(disk_t* disk);
 

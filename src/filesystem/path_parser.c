@@ -10,7 +10,9 @@
             This function checks whether a path is valid or not
             it checks if the first element is a digit (e.g 0:/bin/...)
             then compares other 2 bytes for ":/", memcmp should return 0
-            It also compares the string length of the provided path to 108 (max path length)
+            It also compares the string length of the provided path to 108 (max path length).
+
+            Validates: 0:/ of the given path
     
     @param filename takes a constant character pointer to the filename (c style string)
     @return Returns int 1 if it's valid or 0 if not.
@@ -37,7 +39,7 @@ static int pathparser_get_drive_by_path(const char** path){
 
     int drive_number = to_numeric_digit(*path[0]);
     
-    //skip drive number by adding 3 bytes
+    //skip the path root by adding 3 bytes
     *path += 3;
 
     return drive_number;
@@ -47,7 +49,7 @@ static int pathparser_get_drive_by_path(const char** path){
     @brief This function creates a path root. It allocates memory for path, assigns the drive number
         and sets the first (pointer to the first part to NULL) (path_r->first is the head of the parsed path).
         Path after allocation "{drive_number}/NULL".
-    @param drive_number integer to the drive number (e.g 3 -> 3/NULL after allocation)
+    @param drive_number integer to the drive number (e.g 3 -> 3:/NULL after allocation)
     @return A pointer to the allocated path root
 */
 static path_root_t* pathparser_create_root(int drive_number){

@@ -3,13 +3,9 @@
 #include "config.h"
 
 /*
-    @name: diskstreamer_new
-    @brief: creates a new disk streamer
-            sets byte position to 0
-    @param: int disk id
+    @brief: Creates a new disk streamer and sets a byte position to 0
     @return: pointer to new created streamer (disk_stream*)
 */
-
 disk_stream_t* diskstreamer_new(int disk_id){
     disk_t* disk = get_disk(disk_id);
     if(!disk){
@@ -24,9 +20,7 @@ disk_stream_t* diskstreamer_new(int disk_id){
 }
 
 /*
-    @name: diskstreamer_seek
-    @brief: changes the position of the disk streamer to provided position
-    @param: streamer (disk_stream_t* type), int position (provided position)
+    @brief: Changes the position of the disk streamer to provided position
     @return: int 0
 */
 int diskstreamer_seek(disk_stream_t* streamer, int pos){
@@ -37,7 +31,6 @@ int diskstreamer_seek(disk_stream_t* streamer, int pos){
 /*
     @brief This reads a sector into memory and offsets to the correct position.
 */
-
 int diskstreamer_read(disk_stream_t* stream, void* out, int total){
     int sector = stream->pos / VARGOOS_SECTOR_SIZE;
     int offset = stream->pos % VARGOOS_SECTOR_SIZE;

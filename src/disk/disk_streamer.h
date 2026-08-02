@@ -3,10 +3,10 @@
 
 #include "disk.h"
 
-struct disk_stream{
+typedef struct disk_stream{
     int pos; //byte position
     disk_t* disk;
-} typedef disk_stream_t;
+} disk_stream_t;
 
 disk_stream_t* diskstreamer_new(int disk_id);
 int diskstreamer_seek(disk_stream_t* streamer, int pos);

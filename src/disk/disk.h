@@ -9,13 +9,13 @@ typedef unsigned int VARGOOS_DISK_TYPE;
 #define VARGOOS_DISK_TYPE_REAL 0
 
 
-struct disk{
+typedef struct disk{
     VARGOOS_DISK_TYPE type;
     int sector_size;
     int id; // Disk id
     filesystem_t* filesystem;
     void* fs_private; // Private data of the filesystem
-}typedef disk_t;
+} disk_t;
 
 void disk_search_init();
 disk_t* get_disk(int index);

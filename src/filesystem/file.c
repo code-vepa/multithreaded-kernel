@@ -56,7 +56,6 @@ void fs_init(){
     @param descriptor_out pointer to the file descriptor that would be modified in this function
     @return Integer response (0 if success) anything less is an error (-3 ENOMEM)
 */
-
 static int file_new_descriptor(file_descriptor_t** descriptor_out){
     int response = -ENOMEM;
 
@@ -126,7 +125,6 @@ FILE_MODE get_file_mode_by_string(const char* str){
     file system that we opened.
     step 6. return the descriptor index.
 */
-
 int fopen(const char* filename, const char* mode_string){
 	int response = 0;
 	path_root_t* root_path = pathparser_parse(filename, NULL);
@@ -182,7 +180,24 @@ out:
 	return response;
 }
 
+int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd){
+    int response = 0;
+    if(size == 0 || nmemb == 0 || fd < 1){
+        response = -EINVARG;
+        goto out;
+    }
 
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc){
+        response = -EINVARG;
+        goto out;
+    }
+
+    response = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char*) ptr);
+
+out:
+    return response;
+}
 
 
 
