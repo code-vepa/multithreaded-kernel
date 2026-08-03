@@ -92,12 +92,5 @@ void kernel_main(void){
     //enable system interrupts
     enable_interrupts();
 
-    int fd = fopen("0:/hello.txt", "r");
-
-    if(fd){
-        print("\nhello.txt is opened\n");
-    }
-
-    while(1){}
 
 }

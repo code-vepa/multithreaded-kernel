@@ -7,10 +7,12 @@
 
 int fat16_resolve(disk_t* disk);
 void* fat16_open(disk_t* disk, path_part_t* path, FILE_MODE mode);
+int fat16_read(disk_t* disk, void* descriptor, uint32_t size, uint32_t nmemb, char* out);
 
 filesystem_t fat16_fs = {
     .resolve = fat16_resolve,
-    .open = fat16_open
+    .open = fat16_open,
+    .read = fat16_read
 };
 
 filesystem_t* fat16_init(){
@@ -316,7 +318,7 @@ static int fat16_read_internal_from_stream(disk_t* disk, disk_stream_t* stream,
 
     int offset_from_cluster = offset % size_of_cluster_bytes;
     int starting_sector = fat16_cluster_to_sector(private, cluster_to_use);
-    int starting_pos = (starting_sector * disk->sector_size) * offset_from_cluster;
+    int starting_pos = (starting_sector * disk->sector_size) + offset_from_cluster;
     int total_to_read = total > size_of_cluster_bytes ? size_of_cluster_bytes : total;
     res = diskstreamer_seek(stream, starting_pos);
     if(res != STATUS_OK){
@@ -486,4 +488,29 @@ void* fat16_open(disk_t* disk, path_part_t* path, FILE_MODE mode){
 
     descriptor->pos = 0;
     return descriptor;
+}
+
+/*
+    @return The amount of nmemb's that were read.
+*/
+int fat16_read(disk_t* disk, void* descriptor, uint32_t size, uint32_t nmemb, char* out){
+    int response = 0;
+    struct fat_file_descriptor* fat_desc = descriptor;
+    struct fat_directory_item* item = fat_desc->item->item;
+
+    int offset = fat_desc->pos;
+
+    for(uint32_t i = 0; i < nmemb; ++i){
+        response = fat16_read_internal(disk, fat16_get_first_cluster(item), offset, size, out);
+        if(ISERR(response)){
+            goto out;
+        }
+        
+        out += size;
+        offset += size;
+    }
+
+    response = nmemb;
+out:
+    return response;
 }

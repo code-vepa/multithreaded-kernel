@@ -7,7 +7,7 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
-#	~/opt/mtools/bin/mcopy -o -i ./bin/os.bin ./hello.txt ::/
+	#~/opt/mtools/bin/mcopy -o -i ./bin/os.bin hello.txt ::/	
 	
 
 ./bin/kernel.bin: $(FILES)
