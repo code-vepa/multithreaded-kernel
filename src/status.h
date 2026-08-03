@@ -8,5 +8,6 @@
 #define EBADPATH 4 //ERROR: bad path (for filesystem)
 #define EFSNOTUS 5 // ERROR: not our filesystem
 #define ERDONLY 6 // ERROR: file mode read only
+#define EUNIMP 7 // ERROR: unimplemented
 
 #endif
