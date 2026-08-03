@@ -61,9 +61,16 @@ void print(const char* str){
 
 static paging_4gb_chunk* kernel_chunk = 0;
 
+void panic(const char* message){
+    print(message);
+
+    while(1){}
+}
+
 void kernel_main(void){
 
     terminal_initialize();
+    
     // first byte (03) is the color and second byte is (41) is the char
     print("Hello world\ntest");
 
