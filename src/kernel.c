@@ -13,6 +13,7 @@
 #include "gdt/gdt.h"
 #include "config.h"
 #include "memory/memory.h"
+#include "task/tss.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -70,11 +71,19 @@ void panic(const char* message){
     while(1){}
 }
 
+struct tss tss;
+
 gdt_t gdt_real[VARGOOS_TOTAL_GDT_SEGMENTS];
 gdt_structured_t gdt_structured[VARGOOS_TOTAL_GDT_SEGMENTS] = {
     {.base = 0x00, .limit = 0x00, .type = 0x00}, // null segment
     {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x9a}, // kernel code segment
-    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x92} //kernel data segment
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x92}, //kernel data segment
+    // User data and code segments
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF8}, // user code segment
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF2}, // user data segment
+
+    //tss
+    {.base = (uint32_t) &tss, .limit = sizeof(tss), .type = 0xE9} // tss segment
 };
 
 
@@ -101,6 +110,13 @@ void kernel_main(void){
     //initialize the IDT
     idt_init();
     
+    //setup tss
+    memset(&tss, 0, sizeof(tss));
+    tss.esp0 = 0x600000;
+    tss.ss0 = KERNEL_DATA_SELECTOR;
+
+    //load tss
+    tss_load(0x28); // 0x28 is the offset from the gdt real
 
     //setup paging
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
