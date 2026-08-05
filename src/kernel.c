@@ -10,6 +10,9 @@
 #include "filesystem/path_parser.h"
 #include "filesystem/file.h"
 #include "string/string.h"
+#include "gdt/gdt.h"
+#include "config.h"
+#include "memory/memory.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -67,12 +70,24 @@ void panic(const char* message){
     while(1){}
 }
 
+gdt_t gdt_real[VARGOOS_TOTAL_GDT_SEGMENTS];
+gdt_structured_t gdt_structured[VARGOOS_TOTAL_GDT_SEGMENTS] = {
+    {.base = 0x00, .limit = 0x00, .type = 0x00}, // null segment
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x9a}, // kernel code segment
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x92} //kernel data segment
+};
+
+
 void kernel_main(void){
 
     terminal_initialize();
     
     // first byte (03) is the color and second byte is (41) is the char
     print("Hello world\ntest");
+
+    memset(gdt_real, 0x00, sizeof(gdt_real));
+    gdt_structured_to_gdt(gdt_real, gdt_structured, VARGOOS_TOTAL_GDT_SEGMENTS);
+    gdt_load(gdt_real, sizeof(gdt_real));
 
     //Initialize the Heap
     kernel_heap_init();

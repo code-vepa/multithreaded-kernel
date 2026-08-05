@@ -51,6 +51,11 @@ void fs_init(){
     fs_load();
 }
 
+static void file_free_descriptor(struct file_descriptor* desc){
+    file_descriptors[desc->index - 1] = 0x00;
+    kfree(desc);
+}
+
 /*
     @brief Create a new file descriptor
     @param descriptor_out pointer to the file descriptor that would be modified in this function
@@ -227,25 +232,19 @@ out:
     return response;
 }
 
+int fclose(int fd){
+    int response = 0;
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc){
+        response = -EIO;
+        goto out;
+    }
 
+    response = desc->filesystem->close(desc->private);
+    if(response == STATUS_OK){
+        file_free_descriptor(desc);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+out:
+    return response;
+}
