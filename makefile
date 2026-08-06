@@ -1,4 +1,4 @@
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/build_idt/idt.asm.o ./build/build_idt/idt.o ./build/build_memory/memory.o ./build/build_io/io.asm.o ./build/build_memory/heap/heap.o ./build/build_memory/heap/kernel_heap.o ./build/build_memory/paging/paging.o ./build/build_memory/paging/paging.asm.o ./build/build_disk/disk.o ./build/build_disk/disk_streamer.o ./build/build_filesystem/path_parser.o ./build/build_filesystem/file.o ./build/build_string/string.o ./build/build_filesystem/build_fat/fat16.o ./build/build_gdt/gdt.o ./build/build_gdt/gdt.asm.o ./build/build_task/tss.o ./build/build_task/tss.asm.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/build_idt/idt.asm.o ./build/build_idt/idt.o ./build/build_memory/memory.o ./build/build_io/io.asm.o ./build/build_memory/heap/heap.o ./build/build_memory/heap/kernel_heap.o ./build/build_memory/paging/paging.o ./build/build_memory/paging/paging.asm.o ./build/build_disk/disk.o ./build/build_disk/disk_streamer.o ./build/build_filesystem/path_parser.o ./build/build_filesystem/file.o ./build/build_string/string.o ./build/build_filesystem/build_fat/fat16.o ./build/build_gdt/gdt.o ./build/build_gdt/gdt.asm.o ./build/build_task/task.o ./build/build_task/tss.asm.o
 INCLUDES = -I ./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-nounsed-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -75,8 +75,8 @@ all: ./bin/boot.bin ./bin/kernel.bin
 ./build/build_task/tss.asm.o: ./src/task/tss.asm
 	nasm -f elf -g ./src/task/tss.asm -o ./build/build_task/tss.asm.o
 
-./build/build_task/tss.o: ./src/task/tss.c
-	i686-elf-gcc $(INCLUDES) -I ./src/task $(FLAGS) -std=gnu99 -c ./src/task/tss.c -o ./build/build_task/tss.o
+./build/build_task/task.o: ./src/task/task.c
+	i686-elf-gcc $(INCLUDES) -I ./src/task $(FLAGS) -std=gnu99 -c ./src/task/task.c -o ./build/build_task/task.o
 
 clean:
 	rm -rf ./bin/boot.bin

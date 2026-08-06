@@ -26,6 +26,7 @@ typedef struct {
 
 
 paging_4gb_chunk* paging_new_4gb(uint8_t flags);
+void paging_free_4gb(paging_4gb_chunk* chunk);
 uint32_t* paging_4gb_chunk_get_directory(paging_4gb_chunk* chunk);
 void paging_switch(uint32_t* directory);
 int paging_set(uint32_t* directory, void* virtual, uint32_t val);
