@@ -37,4 +37,11 @@ void task_free(task_t* task);
 task_t* get_current();
 task_t* task_get_next();
 
+void task_return(registers_t* registers);
+void restore_genpurp_reg(registers_t* registers);
+void user_registers();
+int task_switch(task_t* task);
+int task_page();
+void first_task_run();
+
 #endif

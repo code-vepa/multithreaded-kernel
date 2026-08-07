@@ -132,6 +132,7 @@ int process_load_for_slot(const char* filename, process_t** process, int process
 	task = new_task(_process);
 	if(ERROR_I(task) == 0){
 		response = ERROR_I(task);
+		goto out;
 	}
 
 	_process->task = task;

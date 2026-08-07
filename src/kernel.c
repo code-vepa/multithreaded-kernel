@@ -12,8 +12,11 @@
 #include "string/string.h"
 #include "gdt/gdt.h"
 #include "config.h"
+#include "status.h"
 #include "memory/memory.h"
 #include "task/tss.h"
+#include "task/process.h"
+#include "task/task.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -124,11 +127,7 @@ void kernel_main(void){
     //switch to kernel paging chunk
     paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
 
-    //enable paging
-    enable_paging();
-
-    //enable system interrupts
     enable_interrupts();
-
+    while(1){}
 
 }

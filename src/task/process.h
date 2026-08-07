@@ -16,5 +16,7 @@ typedef struct process{
 	
 } process_t;
 
+int process_load(const char* filename, process_t** process);
+
 
 #endif
