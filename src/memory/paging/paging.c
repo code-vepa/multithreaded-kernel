@@ -133,3 +133,37 @@ void paging_free_4gb(paging_4gb_chunk* chunk){
     kfree(chunk->directory_entry);
     kfree(chunk);
 }
+
+
+
+int paging_map_to(uint32_t* directory, void* virtual_address,
+                 void* absolute_address, void* absolute_end, int flags)
+{
+    int response = 0;
+    if(!paging_is_aligned(virtual_address)){
+        response = -EINVARG;
+        goto out;
+    }
+
+    if(!paging_is_aligned(absolute_address)){
+        response = -EINVARG;
+        goto out;
+    }
+
+    if(!paging_is_aligned(absolute_end)){
+        response = -EINVARG;
+        goto out;
+    }
+
+    if((uint32_t) absolute_end < (uint32_t) absolute_address){
+        response = -EINVARG;
+        goto out;
+    }
+
+    uint32_t total_bytes = absolute_end - absolute_address;
+    int total_pages = total_bytes / PAGING_PAGE_SIZE;
+    response = paging_map_range(directory, virtual_address, absolute_address, total_pages, flags);
+
+out:
+    return response;
+}

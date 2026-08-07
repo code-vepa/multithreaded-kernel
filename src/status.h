@@ -9,5 +9,6 @@
 #define EFSNOTUS 5 // ERROR: not our filesystem
 #define ERDONLY 6 // ERROR: file mode read only
 #define EUNIMP 7 // ERROR: unimplemented
+#define EISTKN 8 // ERROR: slot is taken (in process impl.) 
 
 #endif

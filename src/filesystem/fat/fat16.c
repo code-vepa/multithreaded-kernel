@@ -3,6 +3,7 @@
 #include "string/string.h"
 #include "memory/memory.h"
 #include "memory/heap/kernel_heap.h"
+#include "config.h"
 #include "kernel.h"
 
 int fat16_resolve(disk_t* disk);

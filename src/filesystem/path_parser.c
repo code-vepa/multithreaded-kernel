@@ -1,9 +1,9 @@
 #include "path_parser.h"
 #include "string/string.h"
-#include "kernel.h"
 #include "memory/heap/kernel_heap.h"
 #include "memory/memory.h"
 #include "status.h"
+#include "config.h"
 
 /*  
     @brief 
