@@ -7,7 +7,7 @@
 #include "kernel.h"
 #include "memory/paging/paging.h"
 
-process_t* current = 0; // current running process
+process_t* current_process = 0; // current running process
 static process_t* processes[VARGOOS_MAX_PROCESSES] = {};
 
 static void process_init(process_t* process){
@@ -15,12 +15,12 @@ static void process_init(process_t* process){
 }
 
 process_t* get_current_process(){
-	return current;
+	return current_process;
 }
 
-int get_process(int index){
+process_t* get_process(int index){
 	if(index < 0 || index >= VARGOOS_MAX_PROCESSES){
-		return -EINVARG;
+		return 0x00;
 	}
 
 	return processes[index];
@@ -74,6 +74,7 @@ int process_map_binary(process_t* process){
 		process->absolute_ptr, 
 		paging_align_address(process->absolute_ptr + process->size), 
 		PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+
 	return response;
 }
 
@@ -82,6 +83,16 @@ int process_map_memory(process_t* process){
 	response = process_map_binary(process);
 	return response;
 }
+
+int get_free_slot(){
+	for(int i = 0; i < VARGOOS_MAX_PROCESSES; ++i){
+		if(processes[i] == 0){
+			return i;
+		}
+	}
+	return -EISTKN;
+}
+
 
 int process_load_for_slot(const char* filename, process_t** process, int process_slot){
 	int response = 0;
@@ -127,7 +138,7 @@ int process_load_for_slot(const char* filename, process_t** process, int process
 
 	//map the memory (to page size)
 
-	response = process_map_memory(process);
+	response = process_map_memory(_process);
 	if(response < 0){
 		goto out;
 	}
@@ -143,5 +154,18 @@ out:
 
 		//impl. process_free
 	}
+	return response;
+}
+
+int process_load(const char* filename, process_t** process){
+	int response = 0;
+	int process_slot = get_free_slot();
+	if(process_slot < 0){
+		response = -EISTKN;
+		goto out;
+	}
+
+	response = process_load_for_slot(filename, process, process_slot);
+out:
 	return response;
 }

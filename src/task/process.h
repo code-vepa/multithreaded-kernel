@@ -4,7 +4,7 @@
 #include "config.h"
 #include "task.h"
 
-typedef struct{
+typedef struct process{
 	uint16_t id; // the process id
 	char filename[VARGOOS_MAX_PATH];
 	task_t* task; // the main process task	

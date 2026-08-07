@@ -3,6 +3,7 @@
 #include "status.h"
 #include "memory/heap/kernel_heap.h"
 #include "memory/memory.h"
+#include "process.h"
 
 task_t* head = 0;
 task_t* tail = 0;
@@ -12,7 +13,7 @@ task_t* get_current(){
     return current;
 }
 
-int task_init(task_t* task){
+int task_init(task_t* task, process_t* process){
     memset(task, 0, sizeof(task_t));
     task->page_directory = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if(!task->page_directory){
@@ -22,10 +23,11 @@ int task_init(task_t* task){
     task->registers.ip = VARGOOS_PROGRAM_VIRTUAL_ADDRESS;
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.esp = VARGOOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
+    task->process = process;
     return 0;
 }
 
-task_t* new_task(){
+task_t* new_task(process_t* process){
     int response = 0;
     task_t* task = kzalloc(sizeof(task_t));
     if(!task){
@@ -33,7 +35,7 @@ task_t* new_task(){
         goto out;
     }
 
-    response = task_init(task);
+    response = task_init(task, process);
     if(response != STATUS_OK){
         goto out;
     }

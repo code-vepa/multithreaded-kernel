@@ -12,5 +12,6 @@ int to_numeric_digit(char c);
 int istrncmp(const char* str1, const char* str2, int n);
 int strncmp(const char* str1, const char* str2, int bytes);
 char* strcpy(char* dest, const char* src);
+char* strncpy(char* dest, const char* src, int n);
 
 #endif

@@ -95,3 +95,18 @@ char* strcpy(char* dest, const char* src){
 
     return tmp;
 }
+
+char* strncpy(char* dest, const char* src, int n){
+    int i = 0;
+
+    for(i = 0; i < n - 1; ++i){
+        if(0x00 == src[i]){
+            break;
+        }
+
+        dest[i] = src[i];
+    }
+
+    dest[i] = 0x00;
+    return dest;
+}

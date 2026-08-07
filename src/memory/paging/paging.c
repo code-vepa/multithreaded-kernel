@@ -134,7 +134,38 @@ void paging_free_4gb(paging_4gb_chunk* chunk){
     kfree(chunk);
 }
 
+void* paging_align_address(void* ptr){
+    if(!paging_is_aligned(ptr)){
+        return (void*)((uint32_t) ptr + PAGING_PAGE_SIZE - ((uint32_t) ptr % PAGING_PAGE_SIZE)); 
+    }
 
+    return ptr;
+}
+
+int paging_map(uint32_t* directory, void* virtual_address, void* absolute_address, int flags){
+    if(((unsigned int) virtual_address % PAGING_PAGE_SIZE)
+    || ((unsigned int) absolute_address % PAGING_PAGE_SIZE)){
+        return -EINVARG;
+    }
+
+    return paging_set(directory, virtual_address, (uint32_t) absolute_address | flags);
+}
+
+int paging_map_range(uint32_t* directory, void* virtual_address, void* absolute_address, int total_pages, int flags){
+    int response = 0;
+
+    for(int i = 0; i < total_pages; ++i){
+        response = paging_map(directory, virtual_address, absolute_address, flags);
+
+        if(!response){
+            break;
+        }
+
+        absolute_address += PAGING_PAGE_SIZE;
+        virtual_address += PAGING_PAGE_SIZE;
+    }
+    return response;
+}
 
 int paging_map_to(uint32_t* directory, void* virtual_address,
                  void* absolute_address, void* absolute_end, int flags)

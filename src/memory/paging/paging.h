@@ -32,5 +32,10 @@ void paging_switch(uint32_t* directory);
 int paging_set(uint32_t* directory, void* virtual, uint32_t val);
 int paging_is_aligned(void* address);
 void enable_paging();
+int paging_map_to(uint32_t* directory, void* virtual_address,
+                void* absolute_address, void* absolute_end, int flags);
+int paging_map_range(uint32_t* directory, void* virtual_address, void* absolute_address, int total_pages, int flags);
+int paging_map(uint32_t* directory, void* virtual_address, void* absolute_address, int flags);
+void* paging_align_address(void* ptr);
 
 #endif
