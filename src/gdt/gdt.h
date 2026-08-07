@@ -6,14 +6,14 @@
 /*
     This structure represents the GDT code part from the boot.asm
 */
-typedef struct{
+typedef struct gdt{
     uint16_t segment;
     uint16_t base_first;
     uint8_t base;
     uint8_t access;
     uint8_t high_flags;
     uint8_t base_24_31_bits;
-} gdt_t;
+} __attribute__((packed)) gdt_t;
 
 typedef struct{
     uint32_t base;
