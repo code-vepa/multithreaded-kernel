@@ -131,7 +131,7 @@ void first_task_run(){
     task_return(&head->registers);
 }
 
-void save_task_state(task_t* task, interrupt_frame_t* frame){
+void save_task_state(task_t* task, struct interrupt_frame* frame){
 	task->registers.ip = frame->ip;
 	task->registers.cs = frame->cs;
 	task->registers.flags = frame->flags;
@@ -149,7 +149,7 @@ void save_task_state(task_t* task, interrupt_frame_t* frame){
 /*
 	@brief This function needs to be called from the kernel land (kernel_page())
 */
-void current_task_state_save(interrupt_frame_t* frame){
+void current_task_state_save(struct interrupt_frame* frame){
 	if(current == 0){
 		panic("PANIC: no current task to save\n");
 	}	
