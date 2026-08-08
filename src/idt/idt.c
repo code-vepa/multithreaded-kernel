@@ -49,3 +49,17 @@ void idt_init(){
     //load the interrup descriptor table
     idt_load(&idtr_descriptor);
 }
+
+void* isrt80h_handler(int command, interrupt_frame_t* frame){
+	void* response = 0;
+	
+	kernel_page();
+	current_task_state_save(frame);
+	response = isr80h_handle_command(command, frame);
+	task_page();
+	
+	return response;
+}
+
+
+

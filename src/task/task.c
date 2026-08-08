@@ -4,6 +4,7 @@
 #include "memory/heap/kernel_heap.h"
 #include "memory/memory.h"
 #include "process.h"
+#include "idt/idt.h"
 
 task_t* head = 0;
 task_t* tail = 0;
@@ -128,4 +129,31 @@ void first_task_run(){
 
     task_switch(head);
     task_return(&head->registers);
+}
+
+void save_task_state(task_t* task, interrupt_frame_t* frame){
+	task->registers.ip = frame->ip;
+	task->registers.cs = frame->cs;
+	task->registers.flags = frame->flags;
+	task->registers.esp = frame->esp;
+	task->registers.ss = frame->ss;
+	task->registers.eax = frame->eax;
+	task->registers.ebp = frame->ebp;
+	task->registers.ebx = frame->ebx;
+	task->registers.ecx = frame->ecx;
+	task->registers.edi = frame->edi;
+	task->registers.edx = frame->edx;
+	task->registers.esi = frame->esi;
+}
+
+/*
+	@brief This function needs to be called from the kernel land (kernel_page())
+*/
+void current_task_state_save(interrupt_frame_t* frame){
+	if(current == 0){
+		panic("PANIC: no current task to save\n");
+	}	
+	
+	task_t* task = current;
+	save_task_state(task, frame);
 }

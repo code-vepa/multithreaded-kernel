@@ -68,6 +68,12 @@ void print(const char* str){
 
 static paging_4gb_chunk* kernel_chunk = 0;
 
+
+void kernel_page(){
+	kernel_registers();
+	paging_switch(kernel_chunk);
+}
+
 void panic(const char* message){
     print(message);
 

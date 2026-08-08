@@ -4,6 +4,8 @@
 #include "memory/paging/paging.h"
 #include "config.h"
 
+typedef struct interrupt_frame_t;
+
 //Represents the CPU registers
 typedef struct{
     uint32_t edi;
@@ -43,5 +45,6 @@ void user_registers();
 int task_switch(task_t* task);
 int task_page();
 void first_task_run();
+void current_task_state_save(interrupt_frame_t* frame);
 
 #endif

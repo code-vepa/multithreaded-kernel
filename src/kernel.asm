@@ -1,6 +1,7 @@
 [BITS 32] ; All code underneath is seen as 32 bits
 
 global _start
+global kernel_registers
 
 extern kernel_main
 
@@ -38,5 +39,16 @@ _start:
 
     call kernel_main
     jmp $
+
+
+; After this, registers point to the kernel data segment
+kernel_registers:
+	mov ax, 10
+	mov ds, ax
+	mov es, ax
+	mov gs, ax
+	mov fs, ax
+	ret
+
 
 times 512-($ - $$) db 0
