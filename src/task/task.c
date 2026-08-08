@@ -105,7 +105,7 @@ void task_free(task_t* task){
 
 int task_switch(task_t* task){
     current = task;
-    paging_switch(task->page_directory->directory_entry);
+    paging_switch(task->page_directory);
     return 0;
 }
 

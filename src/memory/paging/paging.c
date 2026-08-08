@@ -39,7 +39,6 @@ paging_4gb_chunk* paging_new_4gb(uint8_t flags){
 }
 
 /*
-    @name: paging_switch
     @brief: switch the CPU to the different page directory
             loads passed directory to cr3 register
             This function is implemented in assembly paging.asm file
@@ -48,9 +47,9 @@ paging_4gb_chunk* paging_new_4gb(uint8_t flags){
 
     @return: void type
 */
-void paging_switch(uint32_t* directory){
-    paging_load_directory(directory);
-    current_directory = directory;
+void paging_switch(paging_4gb_chunk* directory){
+    paging_load_directory(directory->directory_entry);
+    current_directory = directory->directory_entry;
 }
 
 uint32_t* paging_4gb_chunk_get_directory(paging_4gb_chunk* chunk){
@@ -142,16 +141,16 @@ void* paging_align_address(void* ptr){
     return ptr;
 }
 
-int paging_map(uint32_t* directory, void* virtual_address, void* absolute_address, int flags){
+int paging_map(paging_4gb_chunk* directory, void* virtual_address, void* absolute_address, int flags){
     if(((unsigned int) virtual_address % PAGING_PAGE_SIZE)
     || ((unsigned int) absolute_address % PAGING_PAGE_SIZE)){
         return -EINVARG;
     }
 
-    return paging_set(directory, virtual_address, (uint32_t) absolute_address | flags);
+    return paging_set(directory->directory_entry, virtual_address, (uint32_t) absolute_address | flags);
 }
 
-int paging_map_range(uint32_t* directory, void* virtual_address, void* absolute_address, int total_pages, int flags){
+int paging_map_range(paging_4gb_chunk* directory, void* virtual_address, void* absolute_address, int total_pages, int flags){
     int response = 0;
 
     for(int i = 0; i < total_pages; ++i){
@@ -167,7 +166,7 @@ int paging_map_range(uint32_t* directory, void* virtual_address, void* absolute_
     return response;
 }
 
-int paging_map_to(uint32_t* directory, void* virtual_address,
+int paging_map_to(paging_4gb_chunk* directory, void* virtual_address,
                  void* absolute_address, void* absolute_end, int flags)
 {
     int response = 0;
