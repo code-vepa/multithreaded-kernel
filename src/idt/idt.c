@@ -54,7 +54,7 @@ void idt_init(){
 }
 
 void isr80h_register_command(int id, ISR80H_COMMAND command){
-    if(id <= 0 || id >= VARGOOS_MAX_ISR80H_COMMANDS){
+    if(id < 0 || id >= VARGOOS_MAX_ISR80H_COMMANDS){
         panic("PANIC: command id is out of bounds\n");
         return;
     }
@@ -69,7 +69,7 @@ void isr80h_register_command(int id, ISR80H_COMMAND command){
 void* isr80h_command_handler(int command, struct interrupt_frame* frame){
     void* result = 0;
 
-    if(command <= 0 || command >= VARGOOS_MAX_ISR80H_COMMANDS){
+    if(command < 0 || command >= VARGOOS_MAX_ISR80H_COMMANDS){
         return 0;
     }
 

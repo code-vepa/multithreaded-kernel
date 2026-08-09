@@ -1,0 +1,7 @@
+#include "isr80h.h"
+#include "idt/idt.h"
+#include "misc.h"
+
+void isr80h_register_commands(){
+    isr80h_register_command(system_command0_sum, isr80h_command0_sum);
+}

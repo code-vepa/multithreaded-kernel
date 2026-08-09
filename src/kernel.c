@@ -17,6 +17,7 @@
 #include "task/tss.h"
 #include "task/process.h"
 #include "task/task.h"
+#include "isr80h/isr80h.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -132,8 +133,12 @@ void kernel_main(void){
     
     //switch to kernel paging chunk
     paging_switch(kernel_chunk);
-
+    enable_paging();
     enable_interrupts();
+
+    isr80h_register_commands();
+
+
     while(1){}
 
 }
