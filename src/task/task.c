@@ -121,6 +121,12 @@ int task_page(){
     return 0;
 }
 
+int switch_page_task(task_t* task){
+    user_registers();
+    paging_switch(task->page_directory);
+    return 0;
+}
+
 /*
     @brief This function runs the very first task in the system.
 */
@@ -187,5 +193,18 @@ int copy_string_from_task(task_t* task, void* virtual, void* absolute, int max){
     }
 
     strncpy(absolute, hold, max);
+    return response;
+}
+
+
+void* task_get_stack_item(task_t* task, int index){
+    void* response = 0;
+
+    uint32_t* stack_ptr = (uint32_t*) task->registers.esp;
+    switch_page_task(task);
+    
+    response = (void*) stack_ptr[index];
+    kernel_page();
+
     return response;
 }

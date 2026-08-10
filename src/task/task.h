@@ -47,5 +47,7 @@ int task_page();
 void first_task_run();
 void current_task_state_save(struct interrupt_frame* frame);
 int copy_string_from_task(task_t* task, void* virtual, void* absolute, int max);
+void* task_get_stack_item(task_t* task, int index);
+int switch_page_task(task_t* task);
 
 #endif

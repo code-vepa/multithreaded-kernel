@@ -81,6 +81,14 @@ int process_map_binary(process_t* process){
 int process_map_memory(process_t* process){
 	int response = 0;
 	response = process_map_binary(process);
+	if(response < 0){
+		goto out;
+	}
+	paging_map_to(process->task->page_directory, 
+		(void*) VARGOOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack_ptr, paging_align_address(process->stack_ptr + VARGOOS_USER_PROG_STACK_SIZE),
+		PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+
+out:
 	return response;
 }
 
