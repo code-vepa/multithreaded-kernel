@@ -5,6 +5,8 @@
 #include "memory/memory.h"
 #include "process.h"
 #include "idt/idt.h"
+#include "memory/paging/paging.h"
+#include "string/string.h"
 
 task_t* head = 0;
 task_t* tail = 0;
@@ -156,4 +158,34 @@ void current_task_state_save(struct interrupt_frame* frame){
 	
 	task_t* task = current;
 	save_task_state(task, frame);
+}
+
+
+int copy_string_from_task(task_t* task, void* virtual, void* absolute, int max){
+    if(max >= PAGING_PAGE_SIZE){
+        return -EINVARG;
+    }
+
+    int response = 0;
+
+    char* hold = kzalloc(max);
+    if(!hold){
+        return -ENOMEM;
+    }
+
+    uint32_t* task_dir = task->page_directory->directory_entry;
+    uint32_t prev = get_page(task_dir, hold);
+    paging_map(task->page_directory, hold, hold, PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    paging_switch(task->page_directory);
+    strncpy(hold, virtual, max);
+    kernel_page();
+
+    response = paging_set(task_dir, hold, prev);
+    if(response < 0){
+        kfree(hold);
+        return -EIO;
+    }
+
+    strncpy(absolute, hold, max);
+    return response;
 }

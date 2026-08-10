@@ -156,7 +156,7 @@ int paging_map_range(paging_4gb_chunk* directory, void* virtual_address, void* a
     for(int i = 0; i < total_pages; ++i){
         response = paging_map(directory, virtual_address, absolute_address, flags);
 
-        if(!response){
+        if(response < 0){
             break;
         }
 
@@ -196,4 +196,21 @@ int paging_map_to(paging_4gb_chunk* directory, void* virtual_address,
 
 out:
     return response;
+}
+
+/*
+    @brief This function takes a virtual address and returns its entry from the page table. 
+    It will return the address and its flags (that's why it is uint32_t return type)
+*/
+uint32_t get_page(uint32_t* directory, void* virtual){
+    uint32_t dir_index = 0;
+    uint32_t table_index = 0;
+    int response = get_paging_indeces(virtual, &dir_index, &table_index);
+    if(response < 0){
+        return 0;
+    }
+    uint32_t entry = directory[dir_index];
+    uint32_t* table = (uint32_t *)(entry & 0xFFFFF000);
+
+    return table[table_index];
 }
