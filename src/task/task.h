@@ -36,8 +36,8 @@ typedef struct task{
 
 task_t* new_task(struct process* process);
 void task_free(task_t* task);
-task_t* get_current();
-task_t* task_get_next();
+task_t* get_current_task();
+task_t* get_next_task();
 
 void task_return(registers_t* registers);
 void restore_genpurp_reg(registers_t* registers);

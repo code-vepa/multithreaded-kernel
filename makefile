@@ -1,13 +1,13 @@
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/build_idt/idt.asm.o ./build/build_idt/idt.o ./build/build_memory/memory.o ./build/build_io/io.asm.o ./build/build_memory/heap/heap.o ./build/build_memory/heap/kernel_heap.o ./build/build_memory/paging/paging.o ./build/build_memory/paging/paging.asm.o ./build/build_disk/disk.o ./build/build_disk/disk_streamer.o ./build/build_filesystem/path_parser.o ./build/build_filesystem/file.o ./build/build_string/string.o ./build/build_filesystem/build_fat/fat16.o ./build/build_gdt/gdt.o ./build/build_gdt/gdt.asm.o ./build/build_task/task.o ./build/build_task/tss.asm.o ./build/build_task/process.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/build_idt/idt.asm.o ./build/build_idt/idt.o ./build/build_memory/memory.o ./build/build_io/io.asm.o ./build/build_memory/heap/heap.o ./build/build_memory/heap/kernel_heap.o ./build/build_memory/paging/paging.o ./build/build_memory/paging/paging.asm.o ./build/build_disk/disk.o ./build/build_disk/disk_streamer.o ./build/build_filesystem/path_parser.o ./build/build_filesystem/file.o ./build/build_string/string.o ./build/build_filesystem/build_fat/fat16.o ./build/build_gdt/gdt.o ./build/build_gdt/gdt.asm.o ./build/build_task/task.o ./build/build_task/tss.asm.o ./build/build_task/process.o ./build/build_task/task.asm.o ./build/build_isr80h/isr80h.o ./build/build_isr80h/misc.o ./build/build_isr80h/io.o ./build/build_keyboard/keyboard.o
 INCLUDES = -I ./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-nounsed-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
-all: ./bin/boot.bin ./bin/kernel.bin
+all: ./bin/boot.bin ./bin/kernel.bin 
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
-	#~/opt/mtools/bin/mcopy -o -i ./bin/os.bin hello.txt ::/	
+	#~/opt/mtools/bin/mcopy -o -i ./bin/os.bin ./programs/blank/blank.bin ::/
 	
 
 ./bin/kernel.bin: $(FILES)
@@ -81,8 +81,22 @@ all: ./bin/boot.bin ./bin/kernel.bin
 ./build/build_task/process.o: ./src/task/process.c
 	i686-elf-gcc $(INCLUDES) -I ./src/task $(FLAGS) -std=gnu99 -c ./src/task/process.c -o ./build/build_task/process.o
 
+./build/build_task/task.asm.o: ./src/task/task.asm
+	nasm -f elf -g ./src/task/task.asm -o ./build/build_task/task.asm.o
 
-clean:
+./build/build_isr80h/isr80h.o: ./src/isr80h/isr80h.c
+	i686-elf-gcc $(INCLUDES) -I ./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/isr80h.c -o ./build/build_isr80h/isr80h.o
+
+./build/build_isr80h/misc.o: ./src/isr80h/misc.c
+	i686-elf-gcc $(INCLUDES) -I ./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/misc.c -o ./build/build_isr80h/misc.o
+
+./build/build_isr80h/io.o: ./src/isr80h/io.c
+	i686-elf-gcc $(INCLUDES) -I ./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/io.c -o ./build/build_isr80h/io.o
+
+./build/build_keyboard/keyboard.o: ./src/keyboard/keyboard.c
+	i686-elf-gcc $(INCLUDES) -I ./src/keyboard $(FLAGS) -std=gnu99 -c ./src/keyboard/keyboard.c -o ./build/build_keyboard/keyboard.o
+
+clean: 
 	rm -rf ./bin/boot.bin
 	rm -rf ./bin/kernel.bin
 	rm -rf ./bin/os.bin

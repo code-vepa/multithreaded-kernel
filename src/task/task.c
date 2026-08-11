@@ -12,7 +12,7 @@ task_t* head = 0;
 task_t* tail = 0;
 task_t* current = 0;
 
-task_t* get_current(){
+task_t* get_current_task(){
     return current;
 }
 
@@ -67,7 +67,7 @@ out:
     @brief This function will return the next task (if exists) or head (if doesn't).
     Head could be null as well.
 */
-task_t* task_get_next(){
+task_t* get_next_task(){
     if(!current->next){
         return head;
     }
@@ -95,7 +95,7 @@ static void task_list_remove(task_t* task){
     }
 
     if(task == current){
-        current = task_get_next();
+        current = get_next_task();
     }
 
 }
