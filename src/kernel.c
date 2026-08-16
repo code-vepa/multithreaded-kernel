@@ -18,6 +18,7 @@
 #include "task/process.h"
 #include "task/task.h"
 #include "isr80h/isr80h.h"
+#include "keyboard/keyboard.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -96,18 +97,23 @@ gdt_structured_t gdt_structured[VARGOOS_TOTAL_GDT_SEGMENTS] = {
     {.base = (uint32_t) &tss, .limit = sizeof(tss), .type = 0xE9} // tss segment
 };
 
+void pic_timer_callback(struct interrupt_frame* frame){
+    print("Timer activated\n");
+}
 
 void kernel_main(void){
 
     terminal_initialize();
     
     // first byte (03) is the color and second byte is (41) is the char
-    print("Hello world\ntest");
+    print("Hello world\n");
 
     memset(gdt_real, 0x00, sizeof(gdt_real));
+    print("1\n");
     gdt_structured_to_gdt(gdt_real, gdt_structured, VARGOOS_TOTAL_GDT_SEGMENTS);
+    print("2\n");
     gdt_load(gdt_real, sizeof(gdt_real));
-
+    print("3\n");
     //Initialize the Heap
     kernel_heap_init();
 
@@ -134,10 +140,14 @@ void kernel_main(void){
     //switch to kernel paging chunk
     paging_switch(kernel_chunk);
     enable_paging();
-    enable_interrupts();
+   // enable_interrupts();
 
     isr80h_register_commands();
+    keyboard_init();
+    enable_interrupts();
+    print("4\n");
 
+    idt_register_interrupt_callback(0x20, pic_timer_callback);
 
     while(1){}
 

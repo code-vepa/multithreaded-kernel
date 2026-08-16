@@ -14,6 +14,6 @@ void kernel_main(void);
 void print(const char* str);
 void panic(const char* message);
 void kernel_page();
-void kernel_registers();
+extern void kernel_registers();
 
 #endif
