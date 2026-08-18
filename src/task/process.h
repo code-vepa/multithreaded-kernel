@@ -25,5 +25,7 @@ typedef struct process{
 
 int process_load(const char* filename, process_t** process);
 process_t* get_current_process();
+int process_load_switch(const char* filename, process_t** process);
+int process_switch(process_t* process);
 
 #endif

@@ -2,11 +2,14 @@
 #include "kernel.h"
 #include "status.h"
 #include "task/task.h"
+#include "classic.h"
 
 static struct keyboard* virtual_keyboard_head = 0;
 static struct keyboard* virtual_keyboard_tail = 0;
 
-void keyboard_init(){}
+void keyboard_init(){
+    keyboard_insert(classic_init());
+}
 
 int keyboard_insert(struct keyboard* keyboard){
     int response = 0;
@@ -40,6 +43,10 @@ void keyboard_push(char to_push){
     process_t* process = get_current_process();
     if(!process)
         return;
+
+    if(to_push == 0x00){
+        return;
+    }
     
     int index = keyboard_get_tail(process);
     process->keyboard.buffer[index] = to_push;

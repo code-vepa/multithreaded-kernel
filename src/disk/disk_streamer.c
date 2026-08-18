@@ -1,6 +1,7 @@
 #include "disk_streamer.h"
 #include "memory/heap/kernel_heap.h"
 #include "config.h"
+#include "stdbool.h"
 
 /*
     @brief: Creates a new disk streamer and sets a byte position to 0
@@ -34,23 +35,27 @@ int diskstreamer_seek(disk_stream_t* streamer, int pos){
 int diskstreamer_read(disk_stream_t* stream, void* out, int total){
     int sector = stream->pos / VARGOOS_SECTOR_SIZE;
     int offset = stream->pos % VARGOOS_SECTOR_SIZE;
+    int total_to_read = total;
+    bool overflow = (offset + total_to_read) >= VARGOOS_SECTOR_SIZE;
     char buffer[VARGOOS_SECTOR_SIZE];
+
+    if(overflow){
+        total_to_read -= (offset + total_to_read) - VARGOOS_SECTOR_SIZE;
+    }
 
     int response = disk_read_block(stream->disk, sector, 1, buffer);
 
     if(response < 0){
         goto out;
     }
-
-    int total_to_read = total > VARGOOS_SECTOR_SIZE ? VARGOOS_SECTOR_SIZE : total;
     
     for(int i = 0; i < total_to_read; ++i){
         *(char*)out++ = buffer[offset + i];
     }
 
     stream->pos += total_to_read;
-    if(total > VARGOOS_SECTOR_SIZE){
-        response = diskstreamer_read(stream, out, total - VARGOOS_SECTOR_SIZE);
+    if(overflow){
+        response = diskstreamer_read(stream, out, total - total_to_read);
     }
 
 out:

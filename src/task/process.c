@@ -178,3 +178,17 @@ int process_load(const char* filename, process_t** process){
 out:
 	return response;
 }
+
+// int process_switch(process_t* process){
+// 	current_process = process;
+// 	return 0;
+// }
+
+// int process_load_switch(const char* filename, process_t** process){
+// 	int res = process_load(filename, process);
+// 	if(!res){
+// 		process_switch(*process);
+// 	}
+// 	return res;
+// }
+

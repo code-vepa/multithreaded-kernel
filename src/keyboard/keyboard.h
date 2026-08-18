@@ -12,6 +12,7 @@ struct keyboard{
 };
 
 void keyboard_init();
+int keyboard_insert(struct keyboard* keyboard);
 void keyboard_backspace(process_t* process);
 void keyboard_push(char to_push);
 char keyboard_pop();

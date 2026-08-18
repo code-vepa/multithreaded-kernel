@@ -30,8 +30,23 @@ uint16_t terminal_make_char(char c, char color){
     return (color << 8) | c;
 }
 
-void termina_putchar(int x, int y, char c, char color){
+void terminal_putchar(int x, int y, char c, char color){
     video_mem[(y * VGA_WIDTH) + x] = terminal_make_char(c, color);
+}
+
+void terminal_backspace(){
+	if(!terminal_row && !terminal_col){
+		return;
+	}
+
+	if(terminal_col == 0){
+		--terminal_row;
+		terminal_col = VGA_WIDTH;
+		return;
+	}
+	--terminal_col;
+	terminal_writechar(' ', 15);
+	--terminal_col;
 }
 
 void terminal_writechar(char c, char color){
@@ -39,8 +54,12 @@ void terminal_writechar(char c, char color){
         ++terminal_row;
         terminal_col = 0;
     }
-    else{
-        termina_putchar(terminal_col, terminal_row, c, color);
+    if(c == 0x08){
+		terminal_backspace();
+		return;
+	}
+	else{
+        terminal_putchar(terminal_col, terminal_row, c, color);
         ++terminal_col;
         if(terminal_col >= VGA_WIDTH){
             terminal_col = 0;
@@ -54,7 +73,7 @@ void terminal_initialize(){
     for(int y = 0; y < VGA_HEIGHT; ++y){
         for (int x = 0; x < VGA_WIDTH; ++x)
         {
-            termina_putchar(x,y, ' ', 0);
+            terminal_putchar(x,y, ' ', 0);
         }
     }
 }
@@ -97,10 +116,6 @@ gdt_structured_t gdt_structured[VARGOOS_TOTAL_GDT_SEGMENTS] = {
     {.base = (uint32_t) &tss, .limit = sizeof(tss), .type = 0xE9} // tss segment
 };
 
-void pic_timer_callback(struct interrupt_frame* frame){
-    print("Timer activated\n");
-}
-
 void kernel_main(void){
 
     terminal_initialize();
@@ -114,14 +129,14 @@ void kernel_main(void){
     print("2\n");
     gdt_load(gdt_real, sizeof(gdt_real));
     print("3\n");
-    //Initialize the Heap
+//     Initialize the Heap
     kernel_heap_init();
 
-    //Initialize the filesystems
-    fs_init();
+    // //Initialize the filesystems
+    // fs_init();
 
-    //Search and initialize the disks
-    disk_search_init();
+    // //Search and initialize the disks
+    // disk_search_init();
     
     //initialize the IDT
     idt_init();
@@ -136,19 +151,19 @@ void kernel_main(void){
 
     //setup paging
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
-    
+
     //switch to kernel paging chunk
     paging_switch(kernel_chunk);
     enable_paging();
-   // enable_interrupts();
 
-    isr80h_register_commands();
+  //  isr80h_register_commands();
     keyboard_init();
     enable_interrupts();
     print("4\n");
 
-    idt_register_interrupt_callback(0x20, pic_timer_callback);
 
-    while(1){}
+    while(1){
+    }
 
+    
 }

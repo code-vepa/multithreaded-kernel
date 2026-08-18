@@ -21,7 +21,7 @@ extern void isr80h_wrapper();
 void interrupt_handler(int interrupt, struct interrupt_frame* frame){
     //kernel_page();
     if(interrupt_callbacks[interrupt] != 0){
-      //  current_task_state_save(frame);
+        //current_task_state_save(frame);
         interrupt_callbacks[interrupt](frame);
     }
 
