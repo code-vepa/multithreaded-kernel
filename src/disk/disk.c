@@ -54,7 +54,7 @@ void disk_search_init(){
     disk.type = VARGOOS_DISK_TYPE_REAL;
     disk.sector_size = VARGOOS_SECTOR_SIZE;
     disk.id = 0;
-    disk.filesystem = fs_resolve(&disk);
+   // disk.filesystem = fs_resolve(&disk);
 }
 
 disk_t* get_disk(int index){

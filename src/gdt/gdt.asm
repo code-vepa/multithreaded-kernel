@@ -11,6 +11,7 @@ gdt_load:
     ret
 
 section .data
+
 gdt_descriptor:
     dw 0x00 ; size
     dd 0x00 ; gdt start address location

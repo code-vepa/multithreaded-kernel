@@ -19,13 +19,13 @@ extern void no_interrupt();
 extern void isr80h_wrapper();
 
 void interrupt_handler(int interrupt, struct interrupt_frame* frame){
-    //kernel_page();
+    kernel_page();
     if(interrupt_callbacks[interrupt] != 0){
         //current_task_state_save(frame);
         interrupt_callbacks[interrupt](frame);
     }
 
-    //task_page();
+   // task_page();
     outb(0x20, 0x20);
 }
 

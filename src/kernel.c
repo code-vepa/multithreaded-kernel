@@ -53,6 +53,7 @@ void terminal_writechar(char c, char color){
     if(c == '\n'){
         ++terminal_row;
         terminal_col = 0;
+        return;
     }
     if(c == 0x08){
 		terminal_backspace();
@@ -116,6 +117,10 @@ gdt_structured_t gdt_structured[VARGOOS_TOTAL_GDT_SEGMENTS] = {
     {.base = (uint32_t) &tss, .limit = sizeof(tss), .type = 0xE9} // tss segment
 };
 
+void pic_timer_callback(struct interrupt_frame* frame){
+    print("Timer activated\n");
+}
+
 void kernel_main(void){
 
     terminal_initialize();
@@ -127,39 +132,54 @@ void kernel_main(void){
     print("1\n");
     gdt_structured_to_gdt(gdt_real, gdt_structured, VARGOOS_TOTAL_GDT_SEGMENTS);
     print("2\n");
-    gdt_load(gdt_real, sizeof(gdt_real));
+    gdt_load(gdt_real, sizeof(gdt_real) - 1);
     print("3\n");
-//     Initialize the Heap
+
+    print("heap\n");
     kernel_heap_init();
 
-    // //Initialize the filesystems
-    // fs_init();
+    print("fs\n");
+    fs_init();
 
-    // //Search and initialize the disks
-    // disk_search_init();
-    
-    //initialize the IDT
+    print("disk\n");
+    disk_search_init();
+
+    print("idt\n");
     idt_init();
-    
-    //setup tss
+
+    print("tss memset\n");
     memset(&tss, 0, sizeof(tss));
+
+    print("tss setup\n");
     tss.esp0 = 0x600000;
     tss.ss0 = KERNEL_DATA_SELECTOR;
 
-    //load tss
-    tss_load(0x28); // 0x28 is the offset from the gdt real
+    print("tss load\n");
+    tss_load(0x28);
+    print("before paging\n");
 
-    //setup paging
-    kernel_chunk = paging_new_4gb(PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
 
-    //switch to kernel paging chunk
+    print("paging new\n");
+    kernel_chunk = paging_new_4gb(
+        PAGING_IS_WRITABLE |
+        PAGING_IS_PRESENT |
+        PAGING_ACCESS_FROM_ALL
+    );
+
+    print("paging switch\n");
     paging_switch(kernel_chunk);
+
+    print("enable paging\n");
     enable_paging();
 
-  //  isr80h_register_commands();
+    print("keyboard\n");
     keyboard_init();
+
+    print("interrupts\n");
     enable_interrupts();
+
     print("4\n");
+
 
 
     while(1){

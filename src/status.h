@@ -10,5 +10,6 @@
 #define ERDONLY 6 // ERROR: file mode read only
 #define EUNIMP 7 // ERROR: unimplemented
 #define EISTKN 8 // ERROR: slot is taken (in process impl.) 
+#define EINVFORMAT 9 // ERROR: invalid format
 
 #endif

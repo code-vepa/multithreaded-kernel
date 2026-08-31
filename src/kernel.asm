@@ -19,23 +19,43 @@ _start:
     mov ebp, 0x00200000
     mov esp, ebp
 
-    ; Enable the A20 line 
-    in al, 0x92
-    or al, 2
-    out 0x92, al
+    ; ; Enable the A20 line 
+    ; in al, 0x92
+    ; or al, 2
+    ; out 0x92, al
 
-    ; remap master port
-    mov al, 00010001b
-    out 0x20, al ; tell master pic
+    ; ; remap master port
+    ; mov al, 00010001b
+    ; out 0x20, al ; tell master pic
 
-    mov al, 0x20 ;
+    ; mov al, 0x20 ;
+    ; out 0x21, al
+
+    ; mov al, 00000001b
+    ; out 0x21, al
+    ; ; end remap the master pic
+
+    mov al, 0x11
+    out 0x20, al        ; master
+    out 0xA0, al         ; slave
+
+    ; ICW2 - vector offsets
+    mov al, 0x20
+    out 0x21, al         ; master IRQ0-7 -> int 0x20-0x27
+    mov al, 0x28
+    out 0xA1, al         ; slave IRQ8-15 -> int 0x28-0x2F
+
+    ; ICW3 - cascade wiring
+    mov al, 0x04
+    out 0x21, al         ; master: slave attached at IRQ2
+    mov al, 0x02
+    out 0xA1, al         ; slave: cascade identity
+
+    ; ICW4
+    mov al, 0x01
     out 0x21, al
+    out 0xA1, al
 
-    mov al, 00000001b
-    out 0x21, al
-    ; end remap the master pic
-
-    
 
     call kernel_main
     jmp $

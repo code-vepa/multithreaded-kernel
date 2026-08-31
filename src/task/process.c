@@ -61,9 +61,19 @@ out:
 	return response;
 }
 
+static int process_load_elf(const char * filename, process_t* process){
+	int response = 0;
+	
+
+	return response;
+}
+
 static int process_load_data(const char* filename, process_t* process){
 	int response = 0;
-	response = process_load_binary(filename, process);
+	response = process_load_elf(filename, process);
+	if(response == -EINVFORMAT){
+		response = process_load_binary(filename, process);
+	}
 	return response;
 }
 
@@ -179,16 +189,16 @@ out:
 	return response;
 }
 
-// int process_switch(process_t* process){
-// 	current_process = process;
-// 	return 0;
-// }
+int process_switch(process_t* process){
+	current_process = process;
+	return 0;
+}
 
-// int process_load_switch(const char* filename, process_t** process){
-// 	int res = process_load(filename, process);
-// 	if(!res){
-// 		process_switch(*process);
-// 	}
-// 	return res;
-// }
+int process_load_switch(const char* filename, process_t** process){
+	int res = process_load(filename, process);
+	if(!res){
+		process_switch(*process);
+	}
+	return res;
+}
 

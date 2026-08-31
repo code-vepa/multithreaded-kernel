@@ -21,7 +21,7 @@ paging_4gb_chunk* paging_new_4gb(uint8_t flags){
     uint32_t* directory = kzalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE);
     int offset = 0;
 
-    for(int i = 0; i < PAGING_TOTAL_ENTRIES_PER_TABLE; ++i){
+    for(int i = 0; i < PAGING_TOTAL_ENTRIES_PER_TABLE; ++i){  
         //4 * 1024 entries
         uint32_t* entry = kzalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE);
         
