@@ -4,6 +4,11 @@
 #include "config.h"
 #include "task.h"
 
+#define PROCESS_FILETYPE_ELF 0
+#define PROCESS_FILETYPE_BINARY 1
+typedef unsigned char PROCESS_FILETYPE;
+
+
 typedef struct keyboard_buffer{
 	char buffer[VARGOOS_MAX_KEYBOARD_BUFFER_SIZE];
 	int head;
@@ -17,7 +22,12 @@ typedef struct process{
 	task_t* task; // the main process task	
 	// All the dynamic allocated memory by the process
 	void* allocations[VARGOOS_MAX_PROGRAM_ALLOCATIONS];
-	void* absolute_ptr; // the physical address pointer to the process memory
+	PROCESS_FILETYPE filetype;
+	union{
+		void* absolute_ptr; // the physical address pointer to the process memory
+		struct elf_file* elf_file;
+	};
+	
 	void* stack_ptr; // the absolute address to the stack memory
 	uint32_t size; // the size of the data that absolute_ptr is pointing to
 	keyboard_t keyboard;

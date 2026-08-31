@@ -37,6 +37,8 @@ int paging_map_to(paging_4gb_chunk* directory, void* virtual_address,
 int paging_map_range(paging_4gb_chunk* directory, void* virtual_address, void* absolute_address, int total_pages, int flags);
 int paging_map(paging_4gb_chunk* directory, void* virtual_address, void* absolute_address, int flags);
 void* paging_align_address(void* ptr);
+void* paging_align_to_lower_page(void* ptr);
 uint32_t get_page(uint32_t* directory, void* virtual);
+
 
 #endif

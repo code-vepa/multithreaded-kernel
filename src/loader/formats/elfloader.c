@@ -9,7 +9,7 @@
 #include "config.h"
 
 
-const char* elf_signature = {0x7f, 'E', 'L', 'F'};
+const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
 
 static bool elf_valid_signature(void* buffer){
 	return memcmp(buffer, (void*) elf_signature, sizeof(elf_signature)) == 0;
@@ -52,7 +52,7 @@ struct elf32_phdr* elf_pheader(struct elf_header* header){
 		return 0;
 	}
 
-	return (struct elf_phdr*) ((int) header + header->e_phoff);
+	return (struct elf32_phdr*) ((int) header + header->e_phoff);
 }
 
 /*
@@ -116,12 +116,12 @@ int elf_process_pheader(struct elf_file* elf_file, struct elf32_phdr* phdr){
 		case PT_LOAD:
 			res = elf_process_phdr_pt_load(elf_file, phdr);
 		break;
-
 	}
 
+	return res;
 }
 
-int elf_process_pheader(struct elf_file* elf_file){
+int elf_process_pheaders(struct elf_file* elf_file){
 	int res = 0;
 
 	struct elf_header* header = elf_header(elf_file);
@@ -162,7 +162,7 @@ int elf_load(const char* filename, struct elf_file** file_out){
 	fd = res;
 	struct file_stat stat;
 	res = fstat(fd, &stat);
-	if(res <= 0){
+	if(res < 0){
 		goto out;
 	}
 

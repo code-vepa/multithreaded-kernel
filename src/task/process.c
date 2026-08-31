@@ -6,6 +6,7 @@
 #include "string/string.h"
 #include "kernel.h"
 #include "memory/paging/paging.h"
+#include "loader/formats/elfloader.h"
 
 process_t* current_process = 0; // current running process
 static process_t* processes[VARGOOS_MAX_PROCESSES] = {};
@@ -52,6 +53,7 @@ static int process_load_binary(const char* filename, process_t* process){
 		goto out;
 	}
 
+	process->filetype = PROCESS_FILETYPE_BINARY;
 	process->absolute_ptr = program_data;
 	process->size = stat.filesize;
 	
@@ -63,8 +65,16 @@ out:
 
 static int process_load_elf(const char * filename, process_t* process){
 	int response = 0;
+	struct elf_file*  elf_file = 0;
 	
+	response = elf_load(filename, &elf_file);
+	if(response < 0){
+		goto out;
+	}
 
+	process->filetype = PROCESS_FILETYPE_ELF;
+	process->elf_file = elf_file;
+out:
 	return response;
 }
 
@@ -88,9 +98,31 @@ int process_map_binary(process_t* process){
 	return response;
 }
 
+int process_map_elf(process_t* process){
+	int response = 0;
+	struct elf_file* elf_file = process->elf_file;
+	response = paging_map_to(process->task->page_directory, paging_align_to_lower_page(elf_virtual_base(elf_file)),
+			elf_phys_base(elf_file), paging_align_address(elf_phys_end(elf_file)),
+			PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+
+	return response;
+}
+
 int process_map_memory(process_t* process){
 	int response = 0;
-	response = process_map_binary(process);
+	switch(process->filetype){
+		case PROCESS_FILETYPE_ELF:
+			response = process_map_elf(process);
+			break;
+		
+		case PROCESS_FILETYPE_BINARY:
+			response = process_map_binary(process);
+			break;
+
+		default:
+			panic("PANIC: invalid filetype\n");
+	}
+
 	if(response < 0){
 		goto out;
 	}
