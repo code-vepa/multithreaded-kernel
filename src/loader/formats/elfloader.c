@@ -151,6 +151,10 @@ out:
 	return res;
 }
 
+void* elf_phdr_phys_address(struct elf_file* file, struct elf32_phdr* phdr){
+	return elf_memory(file) + phdr->p_offset;
+}
+
 int elf_load(const char* filename, struct elf_file** file_out){
 	struct elf_file* elf_file = kzalloc(sizeof(struct elf_file));
 	int fd = 0;

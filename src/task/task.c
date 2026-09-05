@@ -7,6 +7,7 @@
 #include "idt/idt.h"
 #include "memory/paging/paging.h"
 #include "string/string.h"
+#include "loader/formats/elfloader.h"
 
 task_t* head = 0;
 task_t* tail = 0;
@@ -23,7 +24,14 @@ int task_init(task_t* task, process_t* process){
         return -EIO;
     }
     
-    task->registers.ip = VARGOOS_PROGRAM_VIRTUAL_ADDRESS;
+    
+    if(process->filetype == PROCESS_FILETYPE_ELF){
+        task->registers.ip = elf_header(process->elf_file)->e_entry;
+    }
+    else{
+        task->registers.ip = VARGOOS_PROGRAM_VIRTUAL_ADDRESS;
+    }
+
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.cs = USER_CODE_SEGMENT;
     task->registers.esp = VARGOOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;

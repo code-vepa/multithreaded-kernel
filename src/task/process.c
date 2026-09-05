@@ -101,9 +101,25 @@ int process_map_binary(process_t* process){
 int process_map_elf(process_t* process){
 	int response = 0;
 	struct elf_file* elf_file = process->elf_file;
-	response = paging_map_to(process->task->page_directory, paging_align_to_lower_page(elf_virtual_base(elf_file)),
-			elf_phys_base(elf_file), paging_align_address(elf_phys_end(elf_file)),
-			PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+	struct elf_header* header = elf_header(elf_file);
+	struct elf32_phdr* phdrs = elf_pheader(header);
+
+	for(int i = 0; i < header->e_phnum; ++i){
+		struct elf32_phdr* phdr = &phdrs[i];
+		void* phdr_phys_addr = elf_phdr_phys_address(elf_file, phdr);
+		int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
+		if(phdr->p_flags & PF_W){
+			flags |= PAGING_IS_WRITABLE;
+		}
+		
+		response = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr),
+			paging_align_to_lower_page(phdr_phys_addr), paging_align_address(phdr_phys_addr +phdr->p_filesz),
+			flags);
+	
+		if(ISERR(response)){
+			break;
+		}
+	}
 
 	return response;
 }
