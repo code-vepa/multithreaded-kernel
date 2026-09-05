@@ -37,5 +37,6 @@ int process_load(const char* filename, process_t** process);
 process_t* get_current_process();
 int process_load_switch(const char* filename, process_t** process);
 int process_switch(process_t* process);
-
+void* process_malloc(process_t* process, size_t size);
+void process_free(process_t* process, void* ptr);
 #endif

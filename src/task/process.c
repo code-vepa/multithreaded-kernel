@@ -7,6 +7,7 @@
 #include "kernel.h"
 #include "memory/paging/paging.h"
 #include "loader/formats/elfloader.h"
+#include "stdbool.h"
 
 process_t* current_process = 0; // current running process
 static process_t* processes[VARGOOS_MAX_PROCESSES] = {};
@@ -113,7 +114,7 @@ int process_map_elf(process_t* process){
 		}
 		
 		response = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr),
-			paging_align_to_lower_page(phdr_phys_addr), paging_align_address(phdr_phys_addr +phdr->p_filesz),
+			paging_align_to_lower_page(phdr_phys_addr), paging_align_address(phdr_phys_addr +phdr->p_memsz),
 			flags);
 	
 		if(ISERR(response)){
@@ -250,3 +251,57 @@ int process_load_switch(const char* filename, process_t** process){
 	return res;
 }
 
+static int process_free_alloc_index(process_t* process){
+	int res = -ENOMEM;
+	for(int i = 0; i < VARGOOS_MAX_PROGRAM_ALLOCATIONS; ++i){
+		if(process->allocations[i] == 0){
+			res = i;
+			break;
+		}
+	}
+
+	return res;
+}
+
+void* process_malloc(process_t* process, size_t size){
+	void* ptr = kzalloc(size);
+	if(ptr == 0){
+		return 0; // Failed to allocate
+	}
+
+	int index = process_free_alloc_index(process);
+	if(index < 0){
+		return 0; //No space for index storage
+	}
+
+	process->allocations[index] = ptr;
+	return ptr;
+}
+
+static bool is_process_pointer(process_t* process, void* ptr){
+	for(int i = 0; i < VARGOOS_MAX_PROGRAM_ALLOCATIONS; ++i){
+		if(process->allocations[i] == ptr){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+static void mark_free_allocation(process_t* process, void* ptr){
+	for(int i = 0; i < VARGOOS_MAX_PROGRAM_ALLOCATIONS; ++i){
+		if(process->allocations[i] == ptr){
+			process->allocations[i] = 0x00;
+			return;
+		}
+	}
+}
+
+void process_free(process_t* process, void* ptr){
+	if(!is_process_pointer(process, ptr)){
+		return;
+	}
+
+	mark_free_allocation(process, ptr);
+	kfree(ptr);
+}

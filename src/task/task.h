@@ -29,7 +29,7 @@ struct process;
 typedef struct task{
     paging_4gb_chunk* page_directory; // page dir of the task
     registers_t registers; // registers of the task (when task is idle)
-    struct process* process; // pricess of the task
+    struct process* process; // process of the task
     struct task* next; // next task in DLL
     struct task* prev; // prev task in DLL
 } task_t;
